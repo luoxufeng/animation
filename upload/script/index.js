@@ -1,16 +1,30 @@
-define(['jquery', 'underscore','backbone','uploadImg'],function($, _, Backbone,EasyUpload){
+define(['jquery', 'underscore','backbone','uploadImg','showImages'],function($, _, Backbone,EasyUpload,ShowImages){
 
      var imageView=Backbone.View.extend({
      	el:$("body"),
      	events:{
-           "click .js_img_upload":"imgUpLoad"
+           "change .js_img_upload":"imgUpLoad",
+            "click .upload_img":"toDetailImage",
+            'click .js_close': 'toClose',
+            'click .dump': 'removeImg',
+            "click #spanTest":"test",
+            "click #btnTest":"test"
      	},
      	initialize:function(){
           this.render();
+          // $("#uploadul").delegate(".upload_img","click",this.toDetailImage($(this)));
+           // window.addEventListener('load', function () {
+           //      FastClick.attach(document.body);
+           //  }, false);
      	},
 
      	render:function(){
           this.initUpload();
+           //触发键盘
+            $("#content").on("click", function () {
+                $(this).focus();
+            })
+            $("#content").trigger("click");
      	},
 
      	 initUpload: function () {
@@ -95,6 +109,68 @@ define(['jquery', 'underscore','backbone','uploadImg'],function($, _, Backbone,E
         	  },function(){
         	  	alert("当前上传的图片格式不正确");
         	  });
+        },
+
+        toDetailImage:function(e){
+        	//alert("start");
+           var el = e.currentTarget, self = this,
+                uiscroller = $(el).parents('.upload_photos'),
+                imgList = $(uiscroller).find(".upload_img"),
+
+                imageIndex = imgList.index($(el)),
+                ImageList = [],
+                i;
+            this.imgIndex = imageIndex;
+            imgList.each(function () {
+                var v = {};
+                // var imgSrc = $(this).attr("data-src").replace(/_R_(300|600)_10000.jpg/g, ".jpg");
+                var imgSrc = $(this).attr("src");
+                // if (appAgent.isHybrid()) {
+                //     v.url = encodeURIComponent(imgSrc);
+                // } else {
+                //     v.src = imgSrc;
+                // }
+                v.src=imgSrc;
+                console.log("v.src="+imgSrc);
+                ImageList.push(v);
+            });
+
+
+
+            var imageData = {
+                "current_index": imageIndex + 1,
+                "total_count": imgList.length
+            };
+
+            //配置轮播图
+            var imgs = [];
+            imgList.each(function () {
+                // var imgSrc = $(this).attr("data-src").replace(/_R_(300|600)_10000.jpg/g, ".jpg");
+                var imgSrc = $(this).attr("src");
+                imgs.push(imgSrc);
+            });
+
+            //this.header.hide();
+            ShowImages.init({
+                "imgsUrl": imgs,
+                "detail": "",
+                "currentImg": imageIndex
+            });
+        },
+         toClose: function (e) {
+            //this.header.show();
+            $(".appue_scale").css({
+                "display": "none"
+            });
+            $(".appue_scale ul").html("");
+        },
+        removeImg: function (e) {
+            var liList = this.$el.find("#uploadul li");
+            liList.eq(this.imgIndex + 1).remove();
+            this.toClose();
+        },
+        test:function(){
+        	alert("test click");
         }
      });
     return imageView;

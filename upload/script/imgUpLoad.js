@@ -21,6 +21,7 @@ define(function() {
         }
 
         window.URL = window.URL || window.webkitURL;
+        console.log(window.URL);
         
     }
 
@@ -75,6 +76,7 @@ define(function() {
                         }
                         continue;
                     }
+                    
                     var src = window.URL.createObjectURL(file);
                     window.URL.revokeObjectURL(this.src);
                     file.src = src;
